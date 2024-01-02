@@ -76,12 +76,14 @@ level3 = [
 ]
 
 levels = [level1, level2, level3]
+num_enemies = [2, 5, 10]
 
 class Map:
     def __init__(self, game, level=0):
         self.game = game
         self.levels = levels
         self.mini_map = self.levels[level]
+        self.num_enemies = num_enemies[level]
         self.world_map = {}
         self.rows = len(self.mini_map)
         self.cols = len(self.mini_map[0])
