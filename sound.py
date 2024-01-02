@@ -16,4 +16,5 @@ class Sound:
         self.npc_shot.set_volume(0.2)
         self.shotgun.set_volume(0.5)
         self.npc_pain.set_volume(0.5)
+        
         pg.mixer.music.set_volume(0.3)
