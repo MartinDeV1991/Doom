@@ -69,20 +69,30 @@ class Game:
 
         visible_area_size = (300, 300)
         visible_area_rect = pg.Rect(
-            min(max(self.player.x * 100 * scale_factor - visible_area_size[0] // 2, 0), self.world_map_scaled.get_width() - visible_area_size[0]),
-            min(max(self.player.y * 100 * scale_factor - visible_area_size[1] // 2, 0), self.world_map_scaled.get_height() - visible_area_size[1]),
+            min(
+                max(self.player.x * 100 * scale_factor - visible_area_size[0] // 2, 0),
+                self.world_map_scaled.get_width() - visible_area_size[0],
+            ),
+            min(
+                max(self.player.y * 100 * scale_factor - visible_area_size[1] // 2, 0),
+                self.world_map_scaled.get_height() - visible_area_size[1],
+            ),
             visible_area_size[0],
             visible_area_size[1],
         )
 
         # border_size = 10  # Adjust the border size as needed
         # pg.draw.rect(self.map.world_map_screen, (0, 0, 0, 0), visible_area_rect.inflate(border_size, border_size))
-        self.screen.blit(self.world_map_scaled, (0, 0), area=visible_area_rect)
+        self.screen.blit(
+            self.world_map_scaled,
+            (RES[0] - visible_area_size[0], 0),
+            area=visible_area_rect,
+        )
         border_size = 10  # Adjust the border size as needed
         pg.draw.rect(
             self.screen,
             (0, 0, 0),
-            (0, 0, visible_area_size[0], visible_area_size[1]),
+            (RES[0] - visible_area_size[0], 0, visible_area_size[0], visible_area_size[1]),
             border_size,
         )
 
