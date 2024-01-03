@@ -31,9 +31,6 @@ class ObjectHandler:
         add_sprite(AnimatedSprite(game, pos=(14.5, 1.5)))
         add_sprite(AnimatedSprite(game, pos=(14.5, 4.5)))
 
-        # add_npc(NPC(game))
-        # add_npc(NPC(game, pos=(11.5, 4.5)))
-
     def spawn_npc(self):
         for i in range(self.game.map.num_enemies):
             npc = choices(self.npc_types, self.weights)[0]

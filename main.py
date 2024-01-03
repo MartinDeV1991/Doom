@@ -1,5 +1,7 @@
 import pygame as pg
 import sys
+
+import asyncio
 from settings import *
 from map import *
 from player import *
@@ -17,6 +19,7 @@ class Game:
         pg.init()
         pg.mouse.set_visible(False)
         self.screen = pg.display.set_mode(RES)
+        self.mini_map = pg.Surface(RES, pg.SRCALPHA)
         self.clock = pg.time.Clock()
         self.delta_time = 1
         self.global_trigger = False
@@ -34,9 +37,10 @@ class Game:
         self.weapon = Weapon(self)
         self.sound = Sound(self)
         self.pathfinding = PathFinding(self)
-        pg.mixer.music.play(-1)
+        # pg.mixer.music.play(-1)
 
     def update(self):
+        self.map.world_map_screen.fill((0, 0, 0, 0))
         self.player.update()
         self.raycasting.update()
         self.object_handler.update()
@@ -47,12 +51,40 @@ class Game:
         pg.display.set_caption(f"{self.clock.get_fps() :.1f}")
 
     def draw(self):
-        # self.screen.fill('black')
-        # self.map.draw()
-        # self.player.draw()
-
+        # 3d game
         self.object_renderer.draw()
         self.weapon.draw()
+
+        # 2d map
+        self.map.draw_minimap()
+        self.player.draw()
+        scale_factor = 0.3
+        self.world_map_scaled = pg.transform.scale(
+            self.map.world_map_screen,
+            (
+                int(self.map.world_map_screen.get_width() * scale_factor),
+                int(self.map.world_map_screen.get_height() * scale_factor),
+            ),
+        )
+
+        visible_area_size = (300, 300)
+        visible_area_rect = pg.Rect(
+            min(max(self.player.x * 100 * scale_factor - visible_area_size[0] // 2, 0), self.world_map_scaled.get_width() - visible_area_size[0]),
+            min(max(self.player.y * 100 * scale_factor - visible_area_size[1] // 2, 0), self.world_map_scaled.get_height() - visible_area_size[1]),
+            visible_area_size[0],
+            visible_area_size[1],
+        )
+
+        # border_size = 10  # Adjust the border size as needed
+        # pg.draw.rect(self.map.world_map_screen, (0, 0, 0, 0), visible_area_rect.inflate(border_size, border_size))
+        self.screen.blit(self.world_map_scaled, (0, 0), area=visible_area_rect)
+        border_size = 10  # Adjust the border size as needed
+        pg.draw.rect(
+            self.screen,
+            (0, 0, 0),
+            (0, 0, visible_area_size[0], visible_area_size[1]),
+            border_size,
+        )
 
     def check_events(self):
         self.global_trigger = False
@@ -72,7 +104,9 @@ class Game:
             pg.display.flip()
             pg.time.delay(1500)
             self.new_game()
-    
+            if self.startMusic:
+                pg.mixer.music.play(-1)
+
     def check_win(self):
         if not len(self.object_handler.npc_positions):
             self.object_renderer.win()
@@ -82,18 +116,28 @@ class Game:
             if self.level >= len(self.map.levels):
                 self.level = 0
             print(self.level)
-            self.new_game()        
+            self.new_game()
+            if self.startMusic:
+                pg.mixer.music.play(-1)
 
-    def run(self):
-        print("number of levels", len(self.map.levels))
+    async def main(self):
+        self.startMusic = False
         while True:
+            keys = pg.key.get_pressed()
+            if keys[pg.K_SPACE]:
+                if not self.startMusic:
+                    pg.mixer.music.play(-1)
+                self.startMusic = True
+
             self.check_events()
             self.update()
             self.check_game_over()
             self.check_win()
             self.draw()
 
+            await asyncio.sleep(0)
+
 
 if __name__ == "__main__":
     game = Game()
-    game.run()
+    asyncio.run(game.main())

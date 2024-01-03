@@ -1,4 +1,5 @@
 import pygame as pg
+from settings import *
 
 _ = False
 
@@ -88,15 +89,20 @@ class Map:
         self.rows = len(self.mini_map)
         self.cols = len(self.mini_map[0])
         self.get_map()
+        self.block_size = 100
+        self.world_map_screen = pg.Surface((self.cols * self.block_size, self.rows * self.block_size), pg.SRCALPHA)
 
     def get_map(self):
         for j, row in enumerate(self.mini_map):
             for i, value in enumerate(row):
                 if value:
                     self.world_map[(i, j)] = value
-                    
+
     def draw(self):
         [pg.draw.rect(self.game.screen, 'darkgray', (pos[0] * 100, pos[1] * 100, 100, 100), 2)
          for pos in self.world_map]               
-                    
+    
+    def draw_minimap(self):
+        [pg.draw.rect(self.world_map_screen, 'darkgray', (pos[0] * 100, pos[1] * 100, 100, 100), 2)
+         for pos in self.world_map]
                     
